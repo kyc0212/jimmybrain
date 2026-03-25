@@ -560,9 +560,9 @@ async function createRoom(){
     return;
   }
   try{
-    const data = await api("/api/rooms", {
+    const data = await api("/api/create-room", {
       method:"POST",
-      body: JSON.stringify({ hostName, hostPassword, quiz: localQuiz })
+      body: JSON.stringify({ hostName, hostPassword, title: localQuiz.title, quiz: localQuiz })
     });
     currentPin = data.pin;
     currentName = hostName;
@@ -676,7 +676,7 @@ function renderQuestionBlock(targetImageId, targetTextId, targetAnswersId, timer
   }
   imageBox.innerHTML = q.image ? `<img src="${q.image}" alt="題目圖片">` : '<div style="opacity:.8">本題未設定圖片</div>';
   textBox.textContent = q.question;
-  timerBox.textContent = roomState.timeLeft ?? q.timeLimit ?? 20;
+  timerBox.textContent = roomState.secondsRemaining ?? q.timeLimit ?? 20;
   answersBox.innerHTML = (q.answers || []).map((a, idx) => renderAnswerCard(a, idx, !isHost)).join("");
 }
 
@@ -699,7 +699,7 @@ async function submitAnswer(answerIndex){
 
 async function startQuiz(){
   try{
-    await api("/api/host/start", { method:"POST", body: JSON.stringify({ pin: currentPin, hostPassword }) });
+    await api("/api/start", { method:"POST", body: JSON.stringify({ pin: currentPin, hostPassword }) });
   }catch(err){
     alert("開始失敗：" + err.message);
   }
@@ -707,7 +707,7 @@ async function startQuiz(){
 
 async function nextQuestion(){
   try{
-    await api("/api/host/next", { method:"POST", body: JSON.stringify({ pin: currentPin, hostPassword }) });
+    await api("/api/next", { method:"POST", body: JSON.stringify({ pin: currentPin, hostPassword }) });
     if(isHost) showScreen("hostGameScreen");
   }catch(err){
     alert("下一題失敗：" + err.message);
